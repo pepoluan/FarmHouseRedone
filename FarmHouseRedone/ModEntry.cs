@@ -11,11 +11,26 @@ using Netcode;
 
 namespace FarmHouseRedone
 {
+    class ModConfig
+    {
+        public bool suppressTraceLog { get; set; } = false;
+    }
+
     public class ModEntry : Mod
     {
+        private ModConfig Config;
+
         public override void Entry(IModHelper helper)
         {
+            this.Config = this.Helper.ReadConfig<ModConfig>();
+
+            Logger.suppressTrace = this.Config.suppressTraceLog;
             Logger.monitor = Monitor;
+            if (Logger.suppressTrace)
+            {
+                Logger.Log("WARNING: Trace Logging has been disabled from config.json!", LogLevel.Warn);
+            }
+
             FarmHouseStates.harmony = HarmonyInstance.Create("mabelsyrup.farmhouse");
             FarmHouseStates.spouseRooms = new Dictionary<string, int>();
             FarmHouseStates.reflector = helper.Reflection;
